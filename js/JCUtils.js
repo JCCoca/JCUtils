@@ -465,12 +465,12 @@ function ajax(args = {}){
 			xhttp = new ActiveXObject("Microsoft.XMLHTTP"); 
 		}
 
-		let method   = (typeof args.method === "string") ? args.method.toUpperCase().trim() : "GET";
-		let url      = (typeof args.url === "string") ? args.url : window.location.href;
-		let async    = (typeof args.async === "boolean") ? args.async : true;
-		let user     = (typeof args.user === "string") ? args.user : "";
-		let password = (typeof args.password === "string") ? args.password : "";
-		let dataType = (typeof args.dataType === "string") ? args.dataType.toLowerCase().trim() : "all";
+		let method      = (typeof args.method === "string") ? args.method.toUpperCase().trim() : "GET";
+		let url         = (typeof args.url === "string") ? args.url : window.location.href;
+		let async       = (typeof args.async === "boolean") ? args.async : true;
+		let user        = (typeof args.user === "string") ? args.user : "";
+		let password    = (typeof args.password === "string") ? args.password : "";
+		let dataType    = (typeof args.dataType === "string") ? args.dataType.toLowerCase().trim() : "all";
 
 		let contentType = (typeof args.contentType === "string" || args.contentType == false) ? args.contentType : `application/x-www-form-urlencoded; charset=${window.JCUtils.charset}`;
 		let headers     = (typeof args.headers === "object" && args.header !== null && !Array.isArray(args.header)) ? args.headers : undefined;
@@ -687,24 +687,6 @@ function toast(args = {}){
 		document.querySelector("body").appendChild(tmp);
 	}
 
-	if (window.__closeJCToast === undefined) {
-		window.__closeJCToast = function(element){
-			try{
-				if (element !== undefined) {
-					element.classList.add("close");
-					setTimeout(function(){
-						document.querySelectorAll(".jc-toast.close").forEach(function(element){
-							element.remove();
-						});
-					}, 400);
-				}
-			}
-			catch(e){
-
-			}
-		};
-	}
-
 	document.querySelector(`.jc-toast-box.${position}`).innerHTML += `
 		<div id="jc-toast-${rand}" class="jc-toast show jc-toast-${type} ${(inverse == true) ? "inverse" : ""} ${(rounded == true) ? "rounded" : ""}">
 			${(time > 0 && progressBar == true) ? `<div class="jc-toast-progress-bar start"></div>` : ""}
@@ -719,7 +701,7 @@ function toast(args = {}){
 				</div>
 				${(closeButton == true) ? `
 					<div class="jc-toast-close">
-						<div class="jc-toast-button-close" onclick="__closeJCToast(document.querySelector('#jc-toast-${rand}'))">
+						<div class="jc-toast-button-close" onclick="toastClose(document.querySelector('#jc-toast-${rand}'))">
 							<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
 								<path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
 							</svg>
@@ -740,7 +722,7 @@ function toast(args = {}){
 				if (count*(time/100) >= time) {
 					document.querySelector(`#jc-toast-${rand} .jc-toast-progress-bar`).style.width = "100%";
 					clearInterval(progress);
-					__closeJCToast(document.querySelector(`#jc-toast-${rand}`));
+					toastClose(document.querySelector(`#jc-toast-${rand}`));
 				}
 				else{
 					document.querySelector(`#jc-toast-${rand} .jc-toast-progress-bar`).style.width = count+"%";
@@ -757,30 +739,24 @@ function toast(args = {}){
 	}, 400);
 }
 
-function popup(args = {}){
-	if (window.__closeJCPopup === undefined) {
-		window.__closeJCPopup = function(element = null){
-			if (element === null) {
-				document.querySelector(".jc-popup").classList.add("close");
-				setTimeout(function(){
-					document.querySelector(".jc-popup").remove();
-					if (document.querySelectorAll(".jc-popup").length == 0) {
-						document.querySelector(".jc-popup-backdrop").remove();
-					}
-				}, 200);
-			}
-			else {
-				element.classList.add("close");
-				setTimeout(function(){
-					element.remove();
-					if (document.querySelectorAll(".jc-popup").length == 0) {
-						document.querySelector(".jc-popup-backdrop").remove();
-					}
-				}, 200);
-			}
-		}
+function toastClose(element = null){
+	if (element === null) {
+		document.querySelectorAll(".jc-toast").forEach(function(element){
+			element.classList.add("close");
+			setTimeout(function(){
+				element.remove();
+			}, 200);
+		});
 	}
+	else {
+		element.classList.add("close");
+		setTimeout(function(){
+			element.remove();
+		}, 200);
+	}
+}
 
+function popup(args = {}){
 	var promise = new Promise(function(resolve, reject){
 		try{
 			let rand = Math.ceil(Math.random() * 100000);
@@ -817,7 +793,7 @@ function popup(args = {}){
 						<button 
 							type="button" 
 							id="jc-popup-confirm-button" 
-							class="${(classConfirmButton !== false) ? classConfirmButton : "jc-popup-button jc-popup-confirm-button"}" 
+							class="${(classConfirmButton !== false) ? classConfirmButton : "jc-button jc-confirm-button"}" 
 							${(styleConfirmButton !== false) ? `style="${styleConfirmButton}"` : ""}
 						>
 							${textConfirmButton}
@@ -829,7 +805,7 @@ function popup(args = {}){
 						<button 
 							type="button" 
 							id="jc-popup-cancel-button" 
-							class="${(classCancelButton !== false) ? classCancelButton : "jc-popup-button jc-popup-cancel-button"}" 
+							class="${(classCancelButton !== false) ? classCancelButton : "jc-button jc-cancel-button"}" 
 							${(styleCancelButton !== false) ? `style="${styleCancelButton}"` : ""}
 						>
 							${textCancelButton}
@@ -841,7 +817,7 @@ function popup(args = {}){
 						<button 
 							type="button" 
 							id="jc-popup-close-button" 
-							class="${(classCloseButton !== false) ? classCloseButton : "jc-popup-button jc-popup-close-button"}" 
+							class="${(classCloseButton !== false) ? classCloseButton : "jc-button jc-close-button"}" 
 							${(styleCloseButton !== false) ? `style="${styleCloseButton}"` : ""}
 						>
 							${textCloseButton}
@@ -896,13 +872,6 @@ function popup(args = {}){
 					icon = "";
 					break
 			}
-			
-			if (document.querySelectorAll(".jc-popup-backdrop").length == 0) {
-				let tmp = document.createElement("div");
-				
-				tmp.classList.add("jc-popup-backdrop");
-				document.querySelector("body").appendChild(tmp);
-			}
 
 			if (document.querySelectorAll(".jc-popup-box").length == 0) {
 				let tmp = document.createElement("div");
@@ -919,6 +888,7 @@ function popup(args = {}){
 
 			document.querySelector(".jc-popup-box").innerHTML += `
 				<div id="jc-popup-${rand}" class="jc-popup show">
+					<div class="jc-popup-backdrop"></div>
 					<div class="jc-popup-content">
 						${(icon != "") ? `<div class="jc-popup-icon">${icon}</div>` : ""}
 						${(title != "") ? `<div class="jc-popup-title">${title}</div>` : ""}
@@ -934,7 +904,7 @@ function popup(args = {}){
 					resolve({
 						action: "confirmed",
 						close: function(){
-							__closeJCPopup(document.querySelector(`#jc-popup-${rand}`));
+							popupClose(document.querySelector(`#jc-popup-${rand}`));
 						}
 					});
 				});
@@ -945,7 +915,7 @@ function popup(args = {}){
 					resolve({
 						action: "canceled",
 						close: function(){
-							__closeJCPopup(document.querySelector(`#jc-popup-${rand}`));
+							popupClose(document.querySelector(`#jc-popup-${rand}`));
 						}
 					});
 				});
@@ -953,7 +923,7 @@ function popup(args = {}){
 
 			if (showCloseButton === true) {
 				document.querySelector(`#jc-popup-${rand} #jc-popup-close-button`).addEventListener("click", function(){
-					__closeJCPopup();
+					popupClose();
 				});
 			}
 
@@ -962,14 +932,172 @@ function popup(args = {}){
 			}, 200);
 		}
 		catch (e) {
-			__closeJCPopup();
+			popupClose();
 			reject({message: e.message, stack: e.stack});
 		}
 	});
 
-	promise.close = __closeJCPopup;
+	promise.close = popupClose;
 
 	return promise;
+}
+
+function popupClose(element = null){
+	if (element === null) {
+		document.querySelectorAll(".jc-popup").forEach(function(element){
+			element.classList.add("close");
+			setTimeout(function(){
+				element.remove();
+			}, 200);
+		});
+	}
+	else {
+		element.classList.add("close");
+		setTimeout(function(){
+			element.remove();
+		}, 200);
+	}
+}
+
+function modal(args = {}){
+	let rand = Math.ceil(Math.random() * 100000);
+
+	let headerText = undefined; 
+	let headerHTML = undefined;
+	let headerStyle = undefined;
+	let headerCloseButton = undefined;
+	let bodyText = undefined; 
+	let bodyHTML = undefined;
+	let footerText = undefined; 
+	let footerHTML = undefined;
+	let footerAlign = undefined;
+	let footerButtons = undefined;
+
+	if (typeof args.header === "object" && !Array.isArray(args.header)) {
+		headerText = (typeof args.header.text === "string") ? args.header.text.stripTags() : undefined;
+		headerHTML = (typeof args.header.html === "string") ? args.header.html : undefined;
+		headerStyle = (typeof args.header.style === "string") ? args.header.style : undefined;
+		headerCloseButton = (typeof args.header.closeButton === "boolean") ? args.header.closeButton : undefined;
+	}
+
+	if (typeof args.body === "object" && !Array.isArray(args.body)) {
+		bodyText = (typeof args.body.text === "string") ? args.body.text.stripTags() : undefined;
+		bodyHTML = (typeof args.body.html === "string") ? args.body.html : undefined;
+	}
+
+	if (typeof args.footer === "object" && !Array.isArray(args.footer)) {
+		footerText = (typeof args.footer.text === "string") ? args.footer.text.stripTags() : undefined;
+		footerHTML = (typeof args.footer.html === "string") ? args.footer.html : undefined;
+		footerAlign = (typeof args.footer.align === "string") ? args.footer.align : undefined;
+		footerButtons = (typeof args.footer.buttons === "object" && Array.isArray(args.footer.buttons)) ? args.footer.buttons : undefined;
+	}
+
+	let size = "jc-modal-medium";
+	if (typeof args.size === "string") {
+		switch (args.size.toLowerCase().trim()) {
+			case "xlarge":
+				size = "jc-modal-xlarge";
+				break;
+			case "large":
+				size = "jc-modal-large";
+				break;
+			case "medium":
+				size = "jc-modal-medium";
+				break;
+			case "small":
+				size = "jc-modal-small";
+				break;
+			default:
+				size = "jc-modal-medium";
+				break;
+		}
+	}
+
+	let buttons = "";
+	let events = [];
+	if (footerButtons !== undefined) {
+		footerButtons.forEach(function(data){
+			let idButton = (typeof data.id === "string") ? data.id : "button-"+Math.ceil(Math.random() * 100000);
+			buttons += `
+				<button 
+					type="button" 
+					id="${idButton}" 
+					class="${(typeof data.class === "string") ? data.class : "jc-button jc-button-white"}" 
+					${(data.close === true) ? `onclick="modalClose(document.querySelector('#jc-modal-${rand}'))"` : ""} 
+				>
+					${data.text}
+				</button>
+			`;
+
+			if (typeof data.click === "function") {
+				events.push({
+					id: idButton,
+					function: data.click
+				});
+			}
+		});
+	}
+
+	if (document.querySelectorAll(".jc-modal-box").length == 0) {
+		let tmp = document.createElement("div");
+
+		tmp.classList.add("jc-modal-box");
+		document.querySelector("body").appendChild(tmp);
+	}
+
+	document.querySelector(".jc-modal-box").innerHTML += `
+		<div id="jc-modal-${rand}" class="jc-modal show">
+			<div class="jc-modal-backdrop"></div>
+			<div class="jc-modal-content ${size}">
+				<div class="jc-modal-header">
+					<div class="jc-modal-title" ${(headerStyle !== undefined) ? `style="${headerStyle}"` : ""}>
+						${(headerHTML !== undefined) ? headerHTML : (headerText !== undefined) ? headerText : ""}
+					</div>
+					${(headerCloseButton === true) ? `
+						<div class="jc-modal-close-button" onclick="modalClose(document.querySelector('#jc-modal-${rand}'))">
+							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
+								<path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
+							</svg>
+						</div>
+					` : ""}
+				</div>
+				<div class="jc-modal-body">
+					${(bodyHTML !== undefined) ? bodyHTML : (bodyText !== undefined) ? bodyText : ""}
+				</div>
+				<div class="jc-modal-footer" ${(footerAlign !== undefined) ? `style="text-align: ${footerAlign};"` : ""}>
+					${(footerHTML !== undefined) ? footerHTML : (footerText !== undefined) ? footerText : ""} 
+					${buttons}
+				</div>
+			</div>
+		</div>
+	`;
+
+	document.querySelector(`#jc-modal-${rand} .jc-modal-body`).style.maxHeight = `calc(100% - ${(document.querySelector(`#jc-modal-${rand} .jc-modal-header`).clientHeight + document.querySelector(`#jc-modal-${rand} .jc-modal-footer`).clientHeight)}px)`;
+
+	events.forEach(function(data){
+		document.getElementById(data.id).addEventListener("click", data.function);
+	});
+
+	setTimeout(function(){
+		document.querySelector(`#jc-modal-${rand}`).classList.remove("show");
+	}, 200);
+}
+
+function modalClose(element = null){
+	if (element === null) {
+		document.querySelectorAll(".jc-modal").forEach(function(element){
+			element.classList.add("close");
+			setTimeout(function(){
+				element.remove();
+			}, 200);
+		});
+	}
+	else {
+		element.classList.add("close");
+		setTimeout(function(){
+			element.remove();
+		}, 200);
+	}
 }
 
 function loadingOverlay(action, options = {}){
