@@ -923,7 +923,7 @@ function popup(args = {}){
 
 			if (showCloseButton === true) {
 				document.querySelector(`#jc-popup-${rand} #jc-popup-close-button`).addEventListener("click", function(){
-					popupClose();
+					popupClose(document.querySelector(`#jc-popup-${rand}`));
 				});
 			}
 
