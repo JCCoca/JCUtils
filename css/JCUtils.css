@@ -187,6 +187,46 @@
 	cursor: pointer;
 	background-color: #eee;
 	margin: 0.15rem 0;
+	transition: color 0.125s ease-in-out, 
+				background-color 0.125s ease-in-out, 
+				border-color 0.125s ease-in-out, 
+				box-shadow 0.125s ease-in-out;
+}
+.jc-button:disabled {
+	cursor: not-allowed !important;
+	pointer-events: all !important;
+	opacity: 0.7;
+}
+
+.jc-button-label{
+	text-align: left;
+	padding: 0 !important;
+	border-color: rgba(0,0,0,0.125) !important;
+	display: inline-flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+}
+.jc-button-label-icon{
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0,0,0,0.125);
+	margin: 0;
+	position: relative;
+	top: 0;
+	left: 0;
+	padding: 12px 15px;
+	border-top-left-radius: var(--jc-border-radius);
+	border-bottom-left-radius: var(--jc-border-radius);
+	height: 100%;
+}
+.jc-button-large > .jc-button-label-icon{
+	padding: 13px 19px !important
+}
+.jc-button-label-text{
+	padding: 0 17px 0 17px;
+	width: 100% !important;
+	text-align: center !important;
 }
 
 .jc-button-large{
@@ -197,6 +237,27 @@
 .jc-button-small{
 	padding: 0.35rem 0.85rem;
 	font-size: 0.85rem;
+}
+
+.jc-button-group{
+	position: relative;
+	display: inline-flex;
+	vertical-align: middle;
+}
+.jc-button-group > .jc-button-group{
+	position: relative;
+	flex: 1 1 auto;
+}
+.jc-button-group > .jc-button-group:hover, .jc-button-group > .jc-button-group:focus{
+	z-index: 1;
+}
+.jc-button-group > .jc-button:not(:last-child), .jc-button-group > .jc-button-group:not(:last-child) > .jc-button {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.jc-button-group > .jc-button:nth-child(n+3), .jc-button-group > :not(.jc-button-check) + .jc-button, .jc-button-group > .jc-button-group:not(:first-child) > .jc-button {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 .jc-confirm-button, .jc-button-green{
