@@ -455,6 +455,46 @@ function parseJSON(string){
 	}
 }
 
+function stringToObject(string){
+	if (typeof string === "string") {
+		let object = {};
+		let aux;
+
+		if (string.search(":") !== -1) {
+			if (string.search(",") !== -1) {
+				string.split(",").forEach(function(obj){
+					aux = obj.split(":");
+					object[aux[0]] = aux[1];
+				});
+			}
+			else{
+				aux = string.split(":");
+				object[aux[0]] = aux[1];
+			}
+		}
+		else if (string.search("=") !== -1) {
+			if (string.search("&") !== -1) {
+				string.split("&").forEach(function(obj){
+					aux = obj.split("=");
+					object[aux[0]] = aux[1];
+				});
+			}
+			else{
+				aux = string.split("=");
+				object[aux[0]] = aux[1];
+			}
+		}
+		else{
+			throw "String in invalid format to convert to Object in 'stringToObject'";
+		}
+
+		return object;
+	}
+	else{
+		throw "Invalid data format in 'stringToObject'";
+	}
+}
+
 function ajax(args = {}){
 	var xhttp;
 	var promise = new Promise(function(resolve, reject){
@@ -1149,7 +1189,9 @@ function loadingOverlay(action, options = {}){
 				if (document.querySelectorAll(".jc-loading-overlay").length > 0) {
 					document.querySelector(".jc-loading-overlay").classList.add("close");
 					setTimeout(function(){
-						document.querySelector(".jc-loading-overlay").remove();
+						if (document.querySelectorAll(".jc-loading-overlay").length > 0) {
+							document.querySelector(".jc-loading-overlay").remove();
+						}
 					}, 200);
 				}
 				break;
@@ -1158,3 +1200,155 @@ function loadingOverlay(action, options = {}){
 		}
 	}, delay);
 }
+
+function jcLoadData(element, reset = false){
+	let url = element.getAttribute("data-jc-url");
+	let params = element.getAttribute("data-jc-params");
+	let method = element.getAttribute("data-jc-method");
+	let disabled = element.getAttribute("data-jc-disabled");
+	let value = element.getAttribute("data-jc-value");
+
+	element.querySelectorAll(".jc-loaded-option").forEach(function(child){
+		child.remove();
+	});
+	
+	if (reset == false) {
+		ajax({
+			method: (method !== null) ? method : "GET",
+			url: url,
+			data: params,
+			dataType: "json",
+			async: true
+		}).then(function(response){			
+			if (disabled == "true" && response.data.length == 0) {
+				element.disabled = true;
+			}
+			else{
+				element.disabled = false;
+			}
+
+			foreach(response.data, function(i, data){
+				let option = new Option(data.name, data.value);
+				option.classList.add("jc-loaded-option");
+
+				element.options[element.options.length] = option;
+			});
+
+			if (value !== null) {
+				element.value = value;
+				element.removeAttribute("data-jc-value");
+			}
+		}, function(error){
+			let response = error.responseJSON;
+
+			toast({
+				type: "error",
+				title: "Aviso",
+				message: response.message,
+				inverse: true
+			});
+		});
+	}
+	else{
+		if (disabled == "true") {
+			element.disabled = true;
+		}
+		else{
+			element.disabled = false;
+		}
+	}
+
+	if (element.className.search("jc-change-load-data") !== -1) {
+		jcChangeLoadData(element, (!empty(value) && reset == false) ? false : true);
+	}
+}
+
+function jcChangeLoadData(element, reset = false) {
+	let name = element.name;
+	let value = (!empty(element.value)) ? element.value : ((!empty(element.getAttribute("data-jc-value"))) ? element.getAttribute("data-jc-value") : "");
+	let link = element.getAttribute("data-jc-link");
+	let links = [];
+	
+	if (link.search(",") !== -1) {
+		links = link.split(",");
+	}
+	else{
+		links.push(link);
+	}
+	
+	links.forEach(function(query){
+		let _element = document.querySelector(query);
+		let params = _element.getAttribute("data-jc-params");
+
+		if (empty(params)) {
+			if (!empty(value)) {
+				params = name+"="+value;
+			}
+		}
+		else{
+			if (params.search(name) != -1) {
+				let regexp = new RegExp(`(\\b${name}=)\\S*\\W?`, "gi");
+
+				params = params.replaceAll(regexp, "");
+
+				if (!empty(value)) {
+					params += ((params.length > 0 && params[params.length-1] != "&") ? "&" : "")+name+"="+value;
+				}
+				else{
+					params = (params.length > 0 && params[params.length-1] != "&") ? params : params.substr(0, params.length-1);
+				}
+			}
+			else{
+				if (!empty(value)) {
+					params += "&"+name+"="+value;
+				}
+			}
+		}
+		
+		if (!empty(params)) {
+			_element.setAttribute("data-jc-params", params);
+		}
+		jcLoadData(_element, (!empty(value) && reset == false) ? false : true);
+	});
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+	document.querySelectorAll("select.jc-load-data").forEach(function(element){
+		let init_load = element.getAttribute("data-jc-init-load");
+
+		if (init_load === null || init_load == "true") {
+			jcLoadData(element);
+		}
+		else{
+			element.removeAttribute("data-jc-init-load");
+		}
+	});
+
+	document.querySelectorAll("select.jc-change-load-data").forEach(function(element){
+		element.addEventListener("change", function(){
+			jcChangeLoadData(element);
+		}, false);
+	});
+
+	document.querySelectorAll("input[data-jc-value], select[data-jc-value], textarea[data-jc-value]").forEach(function(element){
+		element.value = element.getAttribute("data-jc-value");
+	});
+
+	document.querySelectorAll("input[type='checkbox'][data-jc-checked], input[type='radio'][data-jc-checked]").forEach(function(element){
+		if (element.getAttribute("data-jc-checked") === "true") {
+			element.checked = true;
+		}
+		else{
+			element.checked = false;
+		}
+	});
+
+	document.querySelectorAll("[data-jc-disabled]").forEach(function(element){
+		if (element.getAttribute("data-jc-disabled") === "true") {
+			element.disabled = true;
+		}
+		else{
+			element.disabled = false;
+		}
+	});
+}, false);
