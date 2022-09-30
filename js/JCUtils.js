@@ -541,7 +541,7 @@ function ajax(args = {}){
 		};
 
 		let data;
-		if (args.data !== undefined && args.data !== null) {
+		if (args.data !== undefined && args.data !== null && args.data !== "") {
 			if (typeof args.data === "object" && !Array.isArray(args.data)) {
 				if (args.data.toString() == "[object FormData]") {
 					data = args.data;
@@ -1328,6 +1328,17 @@ document.addEventListener("DOMContentLoaded", function(){
 		element.addEventListener("change", function(){
 			jcChangeLoadData(element);
 		}, false);
+	});
+
+	document.querySelectorAll("input[type='checkbox'].jc-checkbox-link").forEach(function(element){
+		element.addEventListener("click", function(){
+			let checked = this.checked;
+			let link = this.getAttribute("data-link");
+
+			document.querySelectorAll(link).forEach(function(element){
+				element.checked = checked;
+			});
+		});
 	});
 
 	document.querySelectorAll("input[data-jc-value], select[data-jc-value], textarea[data-jc-value]").forEach(function(element){
