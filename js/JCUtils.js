@@ -239,6 +239,23 @@ function hasURLParams(key){
 	return url.searchParams.has(key);
 }
 
+function setCookie(key, value){
+	document.cookie = key+"="+value;
+}
+
+function getCookie(key = null){
+	let cookie = document.cookie.split(";");
+	let result = {};
+	
+	let aux;
+	cookie.forEach(function(v, k){
+		aux = v.split("=");
+		result[aux[0]] = aux[1];
+	});
+	
+	return (key === null) ? result : result[key];
+}
+
 function empty(variable){
 	switch (typeof variable) {
 		case "string":
