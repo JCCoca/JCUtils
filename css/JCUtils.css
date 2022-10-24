@@ -308,6 +308,94 @@ a:hover {
 	font-size: xxx-large !important;
 }
 
+.jc-text-left{
+	font-align: left;
+}
+
+.jc-text-right{
+	font-align: right;
+}
+
+.jc-text-center{
+	font-align: center;
+}
+
+.jc-text-justify{
+	font-align: justify;
+}
+
+.jc-text-justify-left{
+	font-align: justify;
+	text-align-last: left;
+	-moz-text-align-last: left;
+}
+
+.jc-text-justify-right{
+	font-align: justify;
+	text-align-last: right;
+	-moz-text-align-last: right;
+}
+
+.jc-text-justify-center{
+	font-align: justify;
+	text-align-last: center;
+	-moz-text-align-last: center;
+}
+
+.jc-text-justify-justify{
+	font-align: justify;
+	text-align-last: justify;
+	-moz-text-align-last: justify;
+}
+
+.jc-text-uppercase{
+	 text-transform: uppercase !important;
+}
+
+.jc-text-lowercase{
+	 text-transform: lowercase !important;
+}
+
+.jc-text-capitalize{
+	 text-transform: capitalize !important;
+}
+
+.jc-text-decoration-none{
+	text-decoration: none !important;
+}
+
+.jc-text-decoration-overline{
+	text-decoration: overline !important;
+}
+
+.jc-text-decoration-line-through{
+	text-decoration: line-through !important;
+}
+
+.jc-text-decoration-underline{
+	text-decoration: underline !important;
+}
+
+.jc-text-decoration-underline-overline{
+	text-decoration: underline overline !important;
+}
+
+.jc-text-indent-1{
+	text-indent: 1rem;
+}
+.jc-text-indent-2{
+	text-indent: 2rem;
+}
+.jc-text-indent-3{
+	text-indent: 3rem;
+}
+.jc-text-indent-4{
+	text-indent: 4rem;
+}
+.jc-text-indent-5{
+	text-indent: 5rem;
+}
+
 /* JC Text Color */
 .jc-text-blue{
 	color: var(--jc-blue) !important;
