@@ -241,6 +241,8 @@ function hasURLParams(key){
 
 function setCookie(key, value, options = {}){	
 	if (Object.keys(options).length > 0) {
+		let sameSite = (options.sameSite !== undefined) ? options.sameSite : "Lax";
+		
 		let now = new Date();
 		let expiryDate = now;
 		
@@ -265,6 +267,8 @@ function setCookie(key, value, options = {}){
 			;domain=${window.location.hostname}
 			;path=${window.location.pathname}
 			;expires=${expiryDate.toUTCString()}
+			;samesite=${sameSite}
+			${(window.location.protocol === "https:") ? ";secure" : ""}
 		`;
 	}
 	else{
