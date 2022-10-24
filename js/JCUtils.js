@@ -239,8 +239,37 @@ function hasURLParams(key){
 	return url.searchParams.has(key);
 }
 
-function setCookie(key, value){
-	document.cookie = key+"="+value;
+function setCookie(key, value, options = {}){	
+	if (Object.keys(options).length > 0) {
+		let now = new Date();
+		let expiryDate = now;
+		
+		if (options.days !== undefined) {
+			expiryDate.setDate(expiryDate.getDate() + options.days);
+		}
+		if (options.hours !== undefined) {
+			expiryDate.setHours(expiryDate.getHours() + options.hours);
+		}
+		if (options.minutes !== undefined) {
+			expiryDate.setMinutes(expiryDate.getMinutes() + options.minutes);
+		}
+		if (options.seconds !== undefined) {
+			expiryDate.setSeconds(expiryDate.getSeconds() + options.seconds);
+		}
+		
+		if (expiryDate.getTime() == now.getTime()) {
+			expiryDate.setHours(expiryDate.getHours() + 2);
+		}
+		
+		document.cookie = key+"="+encodeURIComponent(value)+`
+			;domain=${window.location.hostname}
+			;path=${window.location.pathname}
+			;expires=${expiryDate.toUTCString()}
+		`;
+	}
+	else{
+		document.cookie = key+"="+encodeURIComponent(value);
+	}
 }
 
 function getCookie(key = null){
@@ -250,10 +279,27 @@ function getCookie(key = null){
 	let aux;
 	cookie.forEach(function(v, k){
 		aux = v.split("=");
-		result[aux[0]] = aux[1];
+		result[aux[0].trim()] = decodeURIComponent(aux[1]);
 	});
 	
 	return (key === null) ? result : result[key];
+}
+
+function hasCookie(key){
+	let cookie = document.cookie.split(";");
+	let result = {};
+	
+	let aux;
+	cookie.forEach(function(v, k){
+		aux = v.split("=");
+		result[aux[0]] = decodeURIComponent(aux[1]);
+	});
+	
+	return (result[key] !== undefined) ? true : false;
+}
+
+function removeCookie(key){
+	setCookie(key, "", {seconds: 1});
 }
 
 function empty(variable){
