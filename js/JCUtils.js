@@ -240,40 +240,30 @@ function hasURLParams(key){
 }
 
 function setCookie(key, value, options = {}){	
-	if (Object.keys(options).length > 0) {
-		let sameSite = (options.sameSite !== undefined) ? options.sameSite : "Lax";
-		
-		let now = new Date();
-		let expiryDate = now;
-		
-		if (options.days !== undefined) {
-			expiryDate.setDate(expiryDate.getDate() + options.days);
-		}
-		if (options.hours !== undefined) {
-			expiryDate.setHours(expiryDate.getHours() + options.hours);
-		}
-		if (options.minutes !== undefined) {
-			expiryDate.setMinutes(expiryDate.getMinutes() + options.minutes);
-		}
-		if (options.seconds !== undefined) {
-			expiryDate.setSeconds(expiryDate.getSeconds() + options.seconds);
-		}
-		
-		if (expiryDate.getTime() == now.getTime()) {
-			expiryDate.setHours(expiryDate.getHours() + 2);
-		}
-		
-		document.cookie = key+"="+encodeURIComponent(value)+`
-			;domain=${window.location.hostname}
-			;path=${window.location.pathname}
-			;expires=${expiryDate.toUTCString()}
-			;samesite=${sameSite}
-			${(window.location.protocol === "https:") ? ";secure" : ""}
-		`;
+	let sameSite = (options.sameSite !== undefined) ? options.sameSite : "lax";
+
+	let now = new Date();
+	let expiryDate = new Date();
+
+	if (options.days !== undefined) {
+		expiryDate.setDate(expiryDate.getDate() + options.days);
 	}
-	else{
-		document.cookie = key+"="+encodeURIComponent(value);
+	if (options.hours !== undefined) {
+		expiryDate.setHours(expiryDate.getHours() + options.hours);
 	}
+	if (options.minutes !== undefined) {
+		expiryDate.setMinutes(expiryDate.getMinutes() + options.minutes);
+	}
+	if (options.seconds !== undefined) {
+		expiryDate.setSeconds(expiryDate.getSeconds() + options.seconds);
+	}
+
+	document.cookie = key+"="+encodeURIComponent(value)+
+		";domain="+window.location.hostname+
+		";path="+window.location.pathname+
+		((expiryDate.getTime() !== now.getTime()) ? ";expires="+expiryDate.toUTCString() : "")+
+		";samesite="+sameSite+
+		((window.location.protocol === "https:") ? ";secure" : "");
 }
 
 function getCookie(key = null){
@@ -290,20 +280,14 @@ function getCookie(key = null){
 }
 
 function hasCookie(key){
-	let cookie = document.cookie.split(";");
-	let result = {};
-	
-	let aux;
-	cookie.forEach(function(v, k){
-		aux = v.split("=");
-		result[aux[0]] = decodeURIComponent(aux[1]);
-	});
-	
-	return (result[key] !== undefined) ? true : false;
+	let cookie = getCookie();
+	return (cookie[key] !== undefined) ? true : false;
 }
 
 function removeCookie(key){
-	setCookie(key, "", {seconds: 1});
+	if (hasCookie(key)) {
+		setCookie(key, "", {seconds: 1});
+	}
 }
 
 function empty(variable){
